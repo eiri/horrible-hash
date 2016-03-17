@@ -54,7 +54,7 @@ Well, ok, if you insist.
 
 - [ ] Finish with `each`
 - [ ] Beef eunits to be more testy
-- [ ] Add code coverage
+- [x] Add code coverage (Current: 85%)
 - [ ] Drop in travis
 - [ ] Write specs
 - [ ] Add dialyzer analyzer
