@@ -8,37 +8,83 @@
 %% API functions
 %%====================================================================
 
-new(_Name) ->
-  ok.
+new(Name) when is_atom(Name) ->
+  Pid = erlang:spawn_link(fun loop/0),
+  erlang:register(Name, Pid).
 
-delete(_Name) ->
-  ok.
+delete(Name) ->
+  case whereis(Name) of
+    undefined -> false;
+    Pid -> erlang:exit(Pid, kill)
+  end.
 
-get(_Name, _Key) ->
-  value.
+get(Name, Key) ->
+  case whereis(Name) of
+    undefined -> false;
+    Pid ->
+      erlang:send(Pid, {get, Key}),
+      value
+  end.
 
-set(_Name, _Key, _Value) ->
-  ok.
+set(Name, Key, Value) ->
+  case whereis(Name) of
+    undefined -> false;
+    Pid ->
+      {set, Key, Value} == erlang:send(Pid, {set, Key, Value})
+  end.
 
-exists(_Name, _Key) ->
-  true.
+exists(Name, Key) ->
+  case whereis(Name) of
+    undefined -> false;
+    Pid ->
+      erlang:send(Pid, {exists, Key}),
+      true
+  end.
 
-delete(_Name, _Key) ->
-  ok.
+delete(Name, Key) ->
+  case whereis(Name) of
+    undefined -> false;
+    Pid ->
+      {delete, Key} == erlang:send(Pid, {delete, Key})
+  end.
 
-keys(_Name) ->
-  [].
+keys(Name) ->
+  case whereis(Name) of
+    undefined -> false;
+    Pid ->
+      erlang:send(Pid, keys),
+      []
+  end.
 
-values(_Name) ->
-  [].
+values(Name) ->
+  case whereis(Name) of
+    undefined -> false;
+    Pid ->
+      erlang:send(Pid, values),
+      []
+  end.
 
 %% iterator
-each(_Name) ->
-  fun() -> ok end.
+each(Name) ->
+  case whereis(Name) of
+    undefined -> false;
+    Pid ->
+      erlang:send(Pid, each),
+      make_ref()
+  end.
 
 %%====================================================================
 %% Internal functions
 %%====================================================================
+
+loop() ->
+  receive
+    Anything ->
+      io:format("* ~p~n", [Anything]),
+      loop()
+  after
+    infinity -> end_of_universe
+  end.
 
 %%====================================================================
 %% EUnit
@@ -48,16 +94,25 @@ each(_Name) ->
 -include_lib("eunit/include/eunit.hrl").
 
 public_api_test_() ->
-  [
-    {"new", ?_assertEqual(ok, 'horrible-hash':new('$hash'))},
-    {"delete", ?_assertEqual(ok, 'horrible-hash':delete('$hash'))},
-    {"get", ?_assertEqual(value, 'horrible-hash':get('$hash', key))},
-    {"set", ?_assertEqual(ok, 'horrible-hash':set('$hash', key, value))},
-    {"exists", ?_assert('horrible-hash':exists('$hash', key))},
-    {"delete", ?_assertEqual(ok, 'horrible-hash':delete('$hash', key))},
-    {"keys", ?_assertEqual([], 'horrible-hash':keys('$hash'))},
-    {"values", ?_assertEqual([], 'horrible-hash':values('$hash'))},
-    {"each", ?_assert(is_function('horrible-hash':each('$hash')))}
-  ].
+  {setup,
+    fun() ->
+      true = 'horrible-hash':new('$hash'),
+      '$hash'
+    end,
+    fun(Name) ->
+      true = 'horrible-hash':delete(Name)
+    end,
+    fun(Name) ->
+      [
+        {"set", ?_assert('horrible-hash':set(Name, key, value))},
+        {"exists", ?_assert('horrible-hash':exists(Name, key))},
+        {"get", ?_assertEqual(value, 'horrible-hash':get(Name, key))},
+        {"keys", ?_assertEqual([], 'horrible-hash':keys(Name))},
+        {"values", ?_assertEqual([], 'horrible-hash':values(Name))},
+        {"each", ?_assert(is_reference('horrible-hash':each(Name)))},
+        {"delete", ?_assert('horrible-hash':delete(Name, key))}
+      ]
+    end
+  }.
 
 -endif.
