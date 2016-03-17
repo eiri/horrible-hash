@@ -47,6 +47,20 @@ Well, ok, if you insist.
 *   _You have a dash in the module's name, it makes it hard to use._<br />
     That's the point
 
+*   _Yeah, but why not to use it?_
+    Because it destroys referencial transparency, makes debugging difficult and in general gives nothing ETS doesn't give.
+
+## TODO
+
+- [ ] Finish with `each`
+- [ ] Beef eunits to be more testy
+- [ ] Add code coverage
+- [ ] Drop in travis
+- [ ] Write specs
+- [ ] Add dialyzer analyzer
+- [ ] Write @docs
+- [ ] Give the module gh-pages just to check how it works
+
 ## Licence
 
 [MIT](https://github.com/eiri/horrible-hash/blob/master/LICENSE)
