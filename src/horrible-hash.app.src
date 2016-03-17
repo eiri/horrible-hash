@@ -1,0 +1,11 @@
+{application, 'horrible-hash',
+ [{description, "Hash as an erlang process"},
+  {vsn, "0.0.1"},
+  {registered, []},
+  {applications, [kernel, stdlib]},
+  {env,[]},
+  {modules, []},
+  {maintainers, ["Eric Avdey"]},
+  {licenses, ["MIT"]},
+  {links, [{"Github", "https://github.com/eiri/horrible-hash"}]}
+ ]}.
