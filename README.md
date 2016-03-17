@@ -47,7 +47,7 @@ Well, ok, if you insist.
 *   _You have a dash in the module's name, it makes it hard to use._<br />
     That's the point
 
-*   _Yeah, but why not to use it?_
+*   _Yeah, but why not to use it?_<br />
     Because it destroys referencial transparency, makes debugging difficult and in general gives nothing ETS doesn't give.
 
 ## TODO
