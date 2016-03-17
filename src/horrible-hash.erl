@@ -22,8 +22,11 @@ get(Name, Key) ->
   case whereis(Name) of
     undefined -> false;
     Pid ->
-      erlang:send(Pid, {get, Key}),
-      value
+      Ref = make_ref(),
+      erlang:send(Pid, {get, {self(), Ref}, Key}),
+      receive
+        {Ref, Value} -> Value
+      end
   end.
 
 set(Name, Key, Value) ->
@@ -37,8 +40,11 @@ exists(Name, Key) ->
   case whereis(Name) of
     undefined -> false;
     Pid ->
-      erlang:send(Pid, {exists, Key}),
-      true
+      Ref = make_ref(),
+      erlang:send(Pid, {exists, {self(), Ref}, Key}),
+      receive
+        {Ref, Boolean} -> Boolean
+      end
   end.
 
 delete(Name, Key) ->
@@ -52,25 +58,33 @@ keys(Name) ->
   case whereis(Name) of
     undefined -> false;
     Pid ->
-      erlang:send(Pid, keys),
-      []
+      Ref = make_ref(),
+      erlang:send(Pid, {{self(), Ref}, keys}),
+      receive
+        {Ref, Keys} -> Keys
+      end
   end.
 
 values(Name) ->
   case whereis(Name) of
     undefined -> false;
     Pid ->
-      erlang:send(Pid, values),
-      []
+      Ref = make_ref(),
+      erlang:send(Pid, {{self(), Ref}, values}),
+      receive
+        {Ref, Values} -> Values
+      end
   end.
 
-%% iterator
 each(Name) ->
   case whereis(Name) of
     undefined -> false;
     Pid ->
-      erlang:send(Pid, each),
-      make_ref()
+      Ref = make_ref(),
+      erlang:send(Pid, {{self(), Ref}, each}),
+      receive
+        {Ref, {Key, Value}} -> {Key, Value}
+      end
   end.
 
 %%====================================================================
@@ -79,8 +93,33 @@ each(Name) ->
 
 loop() ->
   receive
-    Anything ->
-      io:format("* ~p~n", [Anything]),
+    {get, {From, Ref}, Key} ->
+      Value = erlang:get(Key),
+      erlang:send(From, {Ref, Value}),
+      loop();
+    {set, Key, Value} ->
+      erlang:put(Key, Value),
+      loop();
+    {exists, {From, Ref}, Key} ->
+      erlang:send(From, {Ref, undefined /= erlang:get(Key)}),
+      loop();
+    {delete, Key} ->
+      erlang:erase(Key),
+      loop();
+    {{From, Ref}, keys} ->
+      Keys = [Key || {Key, _} <- erlang:get()],
+      erlang:send(From, {Ref, Keys}),
+      loop();
+    {{From, Ref}, values} ->
+      Values = [Value || {_, Value} <- erlang:get()],
+      erlang:send(From, {Ref, Values}),
+      loop();
+    {{From, Ref}, each} ->
+      %% placeholder
+      erlang:send(From, {Ref, hd(erlang:get())}),
+      loop();
+    Unknown ->
+      io:format("* ~p~n", [Unknown]),
       loop()
   after
     infinity -> end_of_universe
@@ -103,15 +142,15 @@ public_api_test_() ->
       true = 'horrible-hash':delete(Name)
     end,
     fun(Name) ->
-      [
+      {inorder, [
         {"set", ?_assert('horrible-hash':set(Name, key, value))},
         {"exists", ?_assert('horrible-hash':exists(Name, key))},
         {"get", ?_assertEqual(value, 'horrible-hash':get(Name, key))},
-        {"keys", ?_assertEqual([], 'horrible-hash':keys(Name))},
-        {"values", ?_assertEqual([], 'horrible-hash':values(Name))},
-        {"each", ?_assert(is_reference('horrible-hash':each(Name)))},
+        {"keys", ?_assertEqual([key], 'horrible-hash':keys(Name))},
+        {"values", ?_assertEqual([value], 'horrible-hash':values(Name))},
+        {"each", ?_assertEqual({key, value}, 'horrible-hash':each(Name))},
         {"delete", ?_assert('horrible-hash':delete(Name, key))}
-      ]
+      ]}
     end
   }.
 
