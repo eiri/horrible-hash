@@ -20,7 +20,21 @@ make shell
 Erlang/OTP 18 [erts-7.2.1] [source] [64-bit] [smp:4:4] [async-threads:0] [hipe] [kernel-poll:false] [dtrace]
 
 Eshell V7.2.1  (abort with ^G)
-1> %% TBD
+1> 'horrible-hash':new('$hash').
+true
+2> 'horrible-hash':set('$hash', key, value).
+true
+3> 'horrible-hash':exists('$hash', key).    
+true
+4> 'horrible-hash':get('$hash', key).   
+value
+5> 'horrible-hash':delete('$hash', key).
+true
+6> 'horrible-hash':exists('$hash', key).
+false
+7> 'horrible-hash':delete('$hash').     
+** exception exit: killed
+8> 
 ```
 
 ## Include in your project
