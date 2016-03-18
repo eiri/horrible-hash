@@ -66,13 +66,13 @@ Well, ok, if you insist.
 
 ## TODO
 
-- [ ] Finish with `each`
-- [ ] Beef eunits to be more testy
+- [ ] Finish with `each` #1
+- [ ] Beef eunits to be more testy #2
 - [x] Add code coverage (Current: 85%)
-- [ ] Drop in travis
-- [ ] Write specs
+- [ ] Drop in travis #3
+- [ ] Write specs #4
 - [ ] Add dialyzer analyzer
-- [ ] Write @docs
+- [ ] Write @docs #5
 - [ ] Give the module gh-pages just to check how it works
 
 ## Licence
