@@ -85,7 +85,7 @@ each(Name) ->
       Ref = make_ref(),
       erlang:send(Pid, {{self(), Ref}, each}),
       receive
-        {Ref, {Key, Value}} -> {Key, Value}
+        {Ref, Iteration} -> Iteration
       end
   end.
 
@@ -94,35 +94,61 @@ each(Name) ->
 %%====================================================================
 
 loop() ->
+  loop(undefined).
+
+loop(Iterator) ->
   receive
     {get, {From, Ref}, Key} ->
       Value = erlang:get(Key),
       erlang:send(From, {Ref, Value}),
-      loop();
+      loop(Iterator);
     {set, Key, Value} ->
       erlang:put(Key, Value),
-      loop();
+      loop(Iterator);
     {exists, {From, Ref}, Key} ->
       erlang:send(From, {Ref, undefined /= erlang:get(Key)}),
-      loop();
+      loop(Iterator);
     {delete, Key} ->
       erlang:erase(Key),
-      loop();
+      loop(Iterator);
     {{From, Ref}, keys} ->
       Keys = [Key || {Key, _} <- erlang:get()],
       erlang:send(From, {Ref, Keys}),
-      loop();
+      loop(Iterator);
     {{From, Ref}, values} ->
       Values = [Value || {_, Value} <- erlang:get()],
       erlang:send(From, {Ref, Values}),
-      loop();
+      loop(Iterator);
     {{From, Ref}, each} ->
-      %% placeholder
-      erlang:send(From, {Ref, hd(erlang:get())}),
-      loop();
+      KVs = erlang:get(),
+      NewIterator = maybe_start_iterator(Iterator, KVs),
+      case is_pid(NewIterator) andalso is_process_alive(NewIterator) of
+        true ->
+          erlang:send(NewIterator, {{From, Ref}, each}),
+          loop(NewIterator);
+        false ->
+          erlang:send(From, {Ref, []}),
+          loop()
+        end;
     Unknown ->
       io:format("* ~p~n", [Unknown]),
-      loop()
+      loop(Iterator)
+  after
+    infinity -> end_of_universe
+  end.
+
+maybe_start_iterator(undefined, KVs) ->
+  spawn(fun() -> iterator(KVs) end);
+maybe_start_iterator(Iterator, _) ->
+  Iterator.
+
+iterator([]) ->
+  ok;
+iterator([Iteration | Rest]) ->
+  receive
+    {{From, Ref}, each} ->
+      erlang:send(From, {Ref, [Iteration]}),
+      iterator(Rest)
   after
     infinity -> end_of_universe
   end.
@@ -150,8 +176,32 @@ public_api_test_() ->
         {"get", ?_assertEqual(value, 'horrible-hash':get(Name, key))},
         {"keys", ?_assertEqual([key], 'horrible-hash':keys(Name))},
         {"values", ?_assertEqual([value], 'horrible-hash':values(Name))},
-        {"each", ?_assertEqual({key, value}, 'horrible-hash':each(Name))},
-        {"delete", ?_assert('horrible-hash':delete(Name, key))}
+        {"delete", ?_assert('horrible-hash':delete(Name, key))},
+        {"exists", ?_assertNot('horrible-hash':exists(Name, key))}
+      ]}
+    end
+  }.
+
+each_test_() ->
+  {setup,
+    fun() ->
+      true = 'horrible-hash':new('$hash'),
+      lists:foreach(fun(I) ->
+        'horrible-hash':set('$hash', I, I + 100)
+      end, lists:seq(1, 5)),
+      '$hash'
+    end,
+    fun(Name) ->
+      true = 'horrible-hash':delete(Name)
+    end,
+    fun(Name) ->
+      {inorder, [
+        ?_assertEqual([{5, 105}], 'horrible-hash':each(Name)),
+        ?_assertEqual([{4, 104}], 'horrible-hash':each(Name)),
+        ?_assertEqual([{3, 103}], 'horrible-hash':each(Name)),
+        ?_assertEqual([{2, 102}], 'horrible-hash':each(Name)),
+        ?_assertEqual([{1, 101}], 'horrible-hash':each(Name)),
+        ?_assertEqual([], 'horrible-hash':each(Name))
       ]}
     end
   }.

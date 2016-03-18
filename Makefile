@@ -6,7 +6,7 @@ compile:
 	@rebar3 compile
 
 check:
-	@rebar3 eunit
+	@rebar3 eunit -v
 
 clean:
 	@rebar3 clean
