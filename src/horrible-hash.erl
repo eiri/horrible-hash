@@ -9,13 +9,15 @@
 %%====================================================================
 
 new(Name) when is_atom(Name) ->
-  Pid = erlang:spawn_link(fun loop/0),
+  Pid = erlang:spawn(fun loop/0),
   erlang:register(Name, Pid).
 
 delete(Name) ->
   case whereis(Name) of
     undefined -> false;
-    Pid -> erlang:exit(Pid, kill)
+    Pid ->
+      erlang:exit(Pid, kill),
+      unregister(Name)
   end.
 
 get(Name, Key) ->
