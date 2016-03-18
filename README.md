@@ -66,14 +66,7 @@ Well, ok, if you insist.
 
 ## TODO
 
-- [ ] Finish with `each` #1
-- [ ] Beef eunits to be more testy #2
-- [x] Add code coverage (Current: 85%)
-- [ ] Drop in travis #3
-- [ ] Write specs #4
-- [ ] Add dialyzer analyzer
-- [ ] Write @docs #5
-- [ ] Give the module gh-pages just to check how it works
+[TaskList](https://github.com/eiri/horrible-hash/issues/6)
 
 ## Licence
 
