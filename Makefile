@@ -6,6 +6,10 @@ compile:
 	@rebar3 compile
 
 check:
+	@rebar3 eunit
+	@rebar3 cover
+
+eunit:
 	@rebar3 eunit -v
 
 clean:
