@@ -129,10 +129,7 @@ loop(Iterator) ->
         false ->
           erlang:send(From, {Ref, []}),
           loop()
-        end;
-    Unknown ->
-      io:format("* ~p~n", [Unknown]),
-      loop(Iterator)
+        end
   after
     infinity -> end_of_universe
   end.
