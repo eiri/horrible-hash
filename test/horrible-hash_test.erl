@@ -71,17 +71,9 @@ exists_delete_test_() ->
 
 keys_test_() ->
   {setup,
-    fun() ->
-      Name = setup(),
-      lists:foreach(fun(I) ->
-        'horrible-hash':set(Name, I, I + 100)
-      end, lists:seq(1, 5)),
-      {Name, lists:reverse(lists:seq(1, 5))}
-    end,
-    fun({Name, _}) ->
-      teardown(Name)
-    end,
-    fun({Name, Keys}) ->
+    fun setup_filled/0,
+    fun teardown/1,
+    fun({Name, Keys, _}) ->
       {inorder, [
         {"pull keys from a hash",
         ?_assertEqual(Keys, 'horrible-hash':keys(Name))},
@@ -103,17 +95,9 @@ keys_test_() ->
 
 values_test_() ->
   {setup,
-    fun() ->
-      Name = setup(),
-      lists:foreach(fun(I) ->
-        'horrible-hash':set(Name, I, I + 100)
-      end, lists:seq(1, 5)),
-      {Name, lists:reverse(lists:seq(101, 105))}
-    end,
-    fun({Name, _}) ->
-      teardown(Name)
-    end,
-    fun({Name, Values}) ->
+    fun setup_filled/0,
+    fun teardown/1,
+    fun({Name, _, Values}) ->
       {inorder, [
         {"pull list of values from a hash",
         ?_assertEqual(Values, 'horrible-hash':values(Name))},
@@ -135,15 +119,9 @@ values_test_() ->
 
 each_test_() ->
   {setup,
-    fun() ->
-      Name = setup(),
-      lists:foreach(fun(I) ->
-        'horrible-hash':set(Name, I, I + 100)
-      end, lists:seq(1, 5)),
-      Name
-    end,
+    fun setup_filled/0,
     fun teardown/1,
-    fun(Name) ->
+    fun({Name, _, _}) ->
       {inorder, [
         each_generator(Name, 5),
         {"last each call returns empty list",
@@ -163,6 +141,17 @@ setup() ->
   true = 'horrible-hash':new(Name),
   Name.
 
+setup_filled() ->
+  Name = setup(),
+  lists:foreach(fun(I) ->
+    'horrible-hash':set(Name, I, I + 100)
+  end, lists:seq(1, 5)),
+  Keys = lists:reverse(lists:seq(1, 5)),
+  Values = lists:reverse(lists:seq(101, 105)),
+  {Name, Keys, Values}.
+
+teardown({Name, _, _}) ->
+  teardown(Name);
 teardown(Name) ->
   true = 'horrible-hash':delete(Name).
 
