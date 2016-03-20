@@ -1,6 +1,8 @@
 # Hash as an erlang process
 ##### Should Not Be Used Without Adult Supervision
 
+[![Build Status](https://travis-ci.org/eiri/horrible-hash.svg?branch=master)](https://travis-ci.org/eiri/horrible-hash)
+
 ## What is it
 This is an erlang module that makes a mutable hash (in Perl's meaning) with a little help of process dictionary.
 
