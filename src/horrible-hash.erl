@@ -8,10 +8,12 @@
 %% API functions
 %%====================================================================
 
+-spec new(Name::atom()) -> true.
 new(Name) when is_atom(Name) ->
   Pid = erlang:spawn(fun loop/0),
   erlang:register(Name, Pid).
 
+-spec delete(Name::atom()) -> boolean().
 delete(Name) ->
   case whereis(Name) of
     undefined -> false;
@@ -20,6 +22,7 @@ delete(Name) ->
       unregister(Name)
   end.
 
+-spec get(Name::atom(), Key::any()) -> Value::any() | false.
 get(Name, Key) ->
   case whereis(Name) of
     undefined -> false;
@@ -31,6 +34,7 @@ get(Name, Key) ->
       end
   end.
 
+-spec set(Name::atom(), Key::any(), Value::any()) -> boolean().
 set(Name, Key, Value) ->
   case whereis(Name) of
     undefined -> false;
@@ -38,6 +42,7 @@ set(Name, Key, Value) ->
       {set, Key, Value} == erlang:send(Pid, {set, Key, Value})
   end.
 
+-spec exists(Name::atom(), Key::any()) -> boolean().
 exists(Name, Key) ->
   case whereis(Name) of
     undefined -> false;
@@ -49,6 +54,7 @@ exists(Name, Key) ->
       end
   end.
 
+-spec delete(Name::atom(), Key::any()) -> boolean().
 delete(Name, Key) ->
   case whereis(Name) of
     undefined -> false;
@@ -56,6 +62,7 @@ delete(Name, Key) ->
       {delete, Key} == erlang:send(Pid, {delete, Key})
   end.
 
+-spec keys(Name::atom()) -> [Key::any()] | false.
 keys(Name) ->
   case whereis(Name) of
     undefined -> false;
@@ -67,6 +74,7 @@ keys(Name) ->
       end
   end.
 
+-spec values(Name::atom()) -> [Value::any()] | false.
 values(Name) ->
   case whereis(Name) of
     undefined -> false;
@@ -78,6 +86,7 @@ values(Name) ->
       end
   end.
 
+-spec each(Name::atom()) -> [{Key::any(), Value::any()}] | [] | false.
 each(Name) ->
   case whereis(Name) of
     undefined -> false;
