@@ -90,7 +90,7 @@ keys_test_() ->
           true = 'horrible-hash':delete(Name, 5),
           ?assertEqual(tl(Keys), 'horrible-hash':keys(Name))
         end)},
-        {"try to pull keys from a non-existan hash",
+        {"try to pull keys from a non-existing hash",
         ?_assertNot('horrible-hash':keys('$none'))},
         {"get an empty list from a hash after deletion of all the keys",
         ?_test(begin
@@ -122,7 +122,7 @@ values_test_() ->
           true = 'horrible-hash':delete(Name, 5),
           ?assertEqual(tl(Values), 'horrible-hash':values(Name))
         end)},
-        {"try to pull the values from a non-existan hash",
+        {"try to pull the values from a non-existing hash",
         ?_assertNot('horrible-hash':values('$none'))},
         {"get an empty list from a hash after deletion of all the keys",
         ?_test(begin
@@ -145,13 +145,11 @@ each_test_() ->
     fun teardown/1,
     fun(Name) ->
       {inorder, [
-        ?_assertEqual([{5, 105}], 'horrible-hash':each(Name)),
-        ?_assertEqual([{4, 104}], 'horrible-hash':each(Name)),
-        ?_assertEqual([{3, 103}], 'horrible-hash':each(Name)),
-        ?_assertEqual([{2, 102}], 'horrible-hash':each(Name)),
-        ?_assertEqual([{1, 101}], 'horrible-hash':each(Name)),
-        ?_assertEqual([], 'horrible-hash':each(Name)),
-        ?_assertNot('horrible-hash':each('$none'))
+        each_generator(Name, 5),
+        {"last each call returns empty list",
+        ?_assertEqual([], 'horrible-hash':each(Name))},
+        {"try to call each on a non-existing hash",
+        ?_assertNot('horrible-hash':each('$none'))}
       ]}
     end
   }.
@@ -167,3 +165,17 @@ setup() ->
 
 teardown(Name) ->
   true = 'horrible-hash':delete(Name).
+
+each_generator(Name, N) ->
+  {generator,
+  fun() ->
+    if N >= 1 ->
+      [make_each_callback(Name, N) | each_generator(Name, N - 1)];
+    true ->
+      []
+    end
+  end}.
+
+make_each_callback(Name, N) ->
+  {"each call returns key " ++ integer_to_list(N),
+  ?_assertEqual([{N, N + 100}], 'horrible-hash':each(Name))}.
