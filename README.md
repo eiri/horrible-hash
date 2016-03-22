@@ -26,16 +26,16 @@ Eshell V7.2.1  (abort with ^G)
 true
 2> 'horrible-hash':set('$hash', key, value).
 true
-3> 'horrible-hash':exists('$hash', key).    
+3> 'horrible-hash':exists('$hash', key).
 true
-4> 'horrible-hash':get('$hash', key).   
+4> 'horrible-hash':get('$hash', key).
 value
 5> 'horrible-hash':delete('$hash', key).
 true
 6> 'horrible-hash':exists('$hash', key).
 false
-7> 'horrible-hash':delete('$hash').     
-** exception exit: killed
+7> 'horrible-hash':delete('$hash').
+true
 8> 
 ```
 
