@@ -29,7 +29,7 @@ get_set_test_() ->
         {"try to get a non-existing value",
         ?_assertEqual(undefined, 'horrible-hash':get(Name, ball))},
         {"try to get a value from a none-existing hash",
-        ?_assertNot('horrible-hash':get('$none', key))}
+        ?_assertEqual(undefined, 'horrible-hash':get('$none', key))}
       ]}
     end
   }.
@@ -83,7 +83,7 @@ keys_test_() ->
           ?assertEqual(tl(Keys), 'horrible-hash':keys(Name))
         end)},
         {"try to pull keys from a non-existing hash",
-        ?_assertNot('horrible-hash':keys('$none'))},
+        ?_assertEqual([], 'horrible-hash':keys('$none'))},
         {"get an empty list from a hash after deletion of all the keys",
         ?_test(begin
           ['horrible-hash':delete(Name, K) || K <- lists:seq(1, 4)],
@@ -107,7 +107,7 @@ values_test_() ->
           ?assertEqual(tl(Values), 'horrible-hash':values(Name))
         end)},
         {"try to pull the values from a non-existing hash",
-        ?_assertNot('horrible-hash':values('$none'))},
+        ?_assertEqual([], 'horrible-hash':values('$none'))},
         {"get an empty list from a hash after deletion of all the keys",
         ?_test(begin
           ['horrible-hash':delete(Name, K) || K <- lists:seq(1, 4)],
@@ -127,7 +127,7 @@ each_test_() ->
         {"last each call returns empty list",
         ?_assertEqual([], 'horrible-hash':each(Name))},
         {"try to call each on a non-existing hash",
-        ?_assertNot('horrible-hash':each('$none'))}
+        ?_assertEqual([], 'horrible-hash':each('$none'))}
       ]}
     end
   }.
