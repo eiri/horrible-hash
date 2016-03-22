@@ -26,10 +26,10 @@ delete(Name) ->
       end
   end.
 
--spec get(Name::atom(), Key::any()) -> Value::any() | false.
+-spec get(Name::atom(), Key::any()) -> Value::any() | undefined.
 get(Name, Key) ->
   case whereis(Name) of
-    undefined -> false;
+    undefined -> undefined;
     Pid ->
       Ref = make_ref(),
       erlang:send(Pid, {get, {self(), Ref}, Key}),
@@ -66,10 +66,10 @@ delete(Name, Key) ->
       {delete, Key} == erlang:send(Pid, {delete, Key})
   end.
 
--spec keys(Name::atom()) -> [Key::any()] | false.
+-spec keys(Name::atom()) -> [Key::any()].
 keys(Name) ->
   case whereis(Name) of
-    undefined -> false;
+    undefined -> [];
     Pid ->
       Ref = make_ref(),
       erlang:send(Pid, {{self(), Ref}, keys}),
@@ -78,10 +78,10 @@ keys(Name) ->
       end
   end.
 
--spec values(Name::atom()) -> [Value::any()] | false.
+-spec values(Name::atom()) -> [Value::any()].
 values(Name) ->
   case whereis(Name) of
-    undefined -> false;
+    undefined -> [];
     Pid ->
       Ref = make_ref(),
       erlang:send(Pid, {{self(), Ref}, values}),
@@ -90,10 +90,10 @@ values(Name) ->
       end
   end.
 
--spec each(Name::atom()) -> [{Key::any(), Value::any()}] | [] | false.
+-spec each(Name::atom()) -> [{Key::any(), Value::any()}].
 each(Name) ->
   case whereis(Name) of
-    undefined -> false;
+    undefined -> [];
     Pid ->
       Ref = make_ref(),
       erlang:send(Pid, {{self(), Ref}, each}),
