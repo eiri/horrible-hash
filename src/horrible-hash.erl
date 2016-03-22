@@ -18,8 +18,12 @@ delete(Name) ->
   case whereis(Name) of
     undefined -> false;
     Pid ->
-      erlang:exit(Pid, kill),
-      unregister(Name)
+      unregister(Name),
+      Ref = monitor(process, Pid),
+      erlang:send(Pid, quit),
+      receive
+        {'DOWN', Ref, process, _, normal} -> true
+      end
   end.
 
 -spec get(Name::atom(), Key::any()) -> Value::any() | false.
@@ -138,7 +142,9 @@ loop(Iterator) ->
         false ->
           erlang:send(From, {Ref, []}),
           loop()
-        end
+        end;
+    quit ->
+      ok
   after
     infinity -> end_of_universe
   end.
