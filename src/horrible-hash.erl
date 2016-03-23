@@ -1,3 +1,9 @@
+%% @doc horrible-hash is implementation of (perl) hash as an erlang process
+%% @version 0.1
+%% @reference <a href="https://github.com/eiri/horrible-hash">https://github.com/eiri/horrible-hash</a>
+%% @author Eric Avdey <eiri@eiri.ca>
+%% @copyright 2016 Eric Avdey
+
 -module('horrible-hash').
 
 %% API exports
@@ -8,11 +14,15 @@
 %% API functions
 %%====================================================================
 
+%% @doc Creates a new hash with a given name.
+%% Internally creates a registred process with hash name
+%% that uses process dictionary to hold provided values.
 -spec new(Name::atom()) -> true.
 new(Name) when is_atom(Name) ->
   Pid = erlang:spawn(fun loop/0),
   erlang:register(Name, Pid).
 
+%% @doc Delete existing hash.
 -spec delete(Name::atom()) -> boolean().
 delete(Name) ->
   case whereis(Name) of
@@ -26,6 +36,8 @@ delete(Name) ->
       end
   end.
 
+%% @doc Gets a value for a given key.
+%% If no value exists returns atom undefined.
 -spec get(Name::atom(), Key::any()) -> Value::any() | undefined.
 get(Name, Key) ->
   case whereis(Name) of
@@ -38,6 +50,8 @@ get(Name, Key) ->
       end
   end.
 
+%% @doc Sets a value for a given key.
+%% If the key already has a value, overrides it.
 -spec set(Name::atom(), Key::any(), Value::any()) -> boolean().
 set(Name, Key, Value) ->
   case whereis(Name) of
@@ -46,6 +60,8 @@ set(Name, Key, Value) ->
       {set, Key, Value} == erlang:send(Pid, {set, Key, Value})
   end.
 
+%% @doc Retrns true is a given key associated with a value in a hash.
+%% Otherwise returns false.
 -spec exists(Name::atom(), Key::any()) -> boolean().
 exists(Name, Key) ->
   case whereis(Name) of
@@ -58,6 +74,8 @@ exists(Name, Key) ->
       end
   end.
 
+%% @doc Removes a given key from a hash.
+%% Returns true even if the hash doesn't have the key.
 -spec delete(Name::atom(), Key::any()) -> boolean().
 delete(Name, Key) ->
   case whereis(Name) of
@@ -66,6 +84,8 @@ delete(Name, Key) ->
       {delete, Key} == erlang:send(Pid, {delete, Key})
   end.
 
+%% @doc Returns a list of all the keys allocated in a hash.
+%% Order not guaranteed.
 -spec keys(Name::atom()) -> [Key::any()].
 keys(Name) ->
   case whereis(Name) of
@@ -78,6 +98,8 @@ keys(Name) ->
       end
   end.
 
+%% @doc Returns a list of all the values stored in a hash.
+%% Order not guaranteed.
 -spec values(Name::atom()) -> [Value::any()].
 values(Name) ->
   case whereis(Name) of
@@ -90,6 +112,10 @@ values(Name) ->
       end
   end.
 
+%% @doc Returns iterator for a hash.
+%% On each call returns a tuple of {Key, Value} until end is reached.
+%% At which moment returns an empty list. Repeated call will initiate
+%% a new iterator.
 -spec each(Name::atom()) -> [{Key::any(), Value::any()}].
 each(Name) ->
   case whereis(Name) of
