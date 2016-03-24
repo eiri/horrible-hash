@@ -4,7 +4,7 @@
 %% @author Eric Avdey <eiri@eiri.ca>
 %% @copyright 2016 Eric Avdey
 
--module('horrible-hash').
+-module(horrible_hash).
 
 %% API exports
 -export([new/1, delete/1, get/2, set/3, exists/2, delete/2]).
