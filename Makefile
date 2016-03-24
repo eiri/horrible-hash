@@ -1,4 +1,4 @@
-.PHONY: all compile check eunit build_plt dialyzer clean shell
+.PHONY: all compile check eunit dialyzer clean shell
 
 all: compile check
 
