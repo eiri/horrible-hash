@@ -1,6 +1,6 @@
 {application, horrible_hash,
  [{description, "Hash as an erlang process"},
-  {vsn, "0.0.1"},
+  {vsn, "0.1.0"},
   {registered, []},
   {applications, [kernel, stdlib]},
   {env,[]},

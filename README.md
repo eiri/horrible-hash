@@ -50,7 +50,7 @@ Well, ok, if you insist.
 
 ```erlang
 {deps, [
-  {horrible_hash, {git, "https://github.com/eiri/horrible-hash.git"}, {tag, "0.0.1"}}
+  {horrible_hash, {git, "https://github.com/eiri/horrible-hash.git"}, {tag, "0.1.0"}}
 ]}
 ```
 
