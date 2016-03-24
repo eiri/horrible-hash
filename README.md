@@ -6,8 +6,10 @@
 ## What is it
 This is an erlang module that makes a mutable hash (in Perl's meaning) with a little help of process dictionary.
 
+
 ## Motivation
 Mischief, mostly.
+
 
 ## Build
 
@@ -39,6 +41,7 @@ true
 8> 
 ```
 
+
 ## Include in your project
 
 Please don't.
@@ -51,9 +54,11 @@ Well, ok, if you insist.
 ]}
 ```
 
+
 ## Usage
 
-:book: TBD
+http://eiri.ca/horrible-hash/
+
 
 ## Random QA
 
@@ -63,9 +68,6 @@ Well, ok, if you insist.
 *   _Yeah, but why not to use it?_<br />
     Because it destroys referencial transparency, makes debugging difficult and in general gives nothing ETS doesn't give.
 
-## TODO
-
-[TaskList](https://github.com/eiri/horrible-hash/issues/6)
 
 ## Licence
 
