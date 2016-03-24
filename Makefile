@@ -7,7 +7,7 @@ compile:
 
 check:
 	@rebar3 eunit
-	@rebar3 cover
+	@rebar3 cover -v
 
 eunit:
 	@rebar3 eunit -v
