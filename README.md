@@ -2,6 +2,7 @@
 ##### Should Not Be Used Without Adult Supervision
 
 [![Build Status](https://travis-ci.org/eiri/horrible-hash.svg?branch=master)](https://travis-ci.org/eiri/horrible-hash)
+[![No Maintenance Intended](http://unmaintained.tech/badge.svg)](http://unmaintained.tech/)
 
 ## What is it
 This is an erlang module that makes a mutable hash (in Perl's meaning) with a little help of process dictionary.
