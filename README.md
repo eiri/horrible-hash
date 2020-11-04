@@ -1,7 +1,7 @@
 # Hash as an erlang process
 ##### Should Not Be Used Without Adult Supervision
 
-[![Build Status](https://travis-ci.org/eiri/horrible-hash.svg?branch=master)](https://travis-ci.org/eiri/horrible-hash)
+[![Build Status](https://github.com/eiri/horrible-hash/workflows/build/badge.svg)](https://github.com/eiri/horrible-hash/actions)
 [![No Maintenance Intended](http://unmaintained.tech/badge.svg)](http://unmaintained.tech/)
 
 ## What is it
@@ -39,7 +39,7 @@ true
 false
 7> horrible_hash:delete('$hash').
 true
-8> 
+8>
 ```
 
 
